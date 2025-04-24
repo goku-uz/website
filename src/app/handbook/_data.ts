@@ -320,15 +320,4 @@ export const AUTHORS = [
   },
 ];
 
-export const READING_PROGRESS = {
-  total: HANDBOOK_CHAPTERS.reduce(
-    (acc, chapter) => acc + chapter.sections.length,
-    0
-  ),
-  completed: 0,
-  nextRecommendation: {
-    chapterId: "basics",
-    sectionSlug: "introduction",
-    title: "Go ga Kirish",
-  },
-};
+

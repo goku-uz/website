@@ -3,12 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  HANDBOOK_CHAPTERS,
-  ADDITIONAL_RESOURCES,
-  AUTHORS,
-  READING_PROGRESS,
-} from "./_data";
+import { HANDBOOK_CHAPTERS, ADDITIONAL_RESOURCES, AUTHORS } from "./_data";
 
 export default function HandbookPage() {
   const [activeFilter, setActiveFilter] = useState<string>("all");
@@ -19,10 +14,14 @@ export default function HandbookPage() {
   // Handle hashtag click
   const handleHashtagClick = (hashtag: string) => {
     // Ensure hashtag is in consistent format with # prefix
-    const formattedHashtag = hashtag.startsWith('#') ? hashtag.toLowerCase() : `#${hashtag.toLowerCase()}`;
-    
+    const formattedHashtag = hashtag.startsWith("#")
+      ? hashtag.toLowerCase()
+      : `#${hashtag.toLowerCase()}`;
+
     if (activeHashtags.includes(formattedHashtag)) {
-      setActiveHashtags(activeHashtags.filter(tag => tag !== formattedHashtag));
+      setActiveHashtags(
+        activeHashtags.filter((tag) => tag !== formattedHashtag)
+      );
     } else {
       setActiveHashtags([...activeHashtags, formattedHashtag]);
     }
@@ -41,14 +40,15 @@ export default function HandbookPage() {
   // Extract all available hashtags for display and ensure they have # prefix
   const allHashtags = Array.from(
     new Set(
-      HANDBOOK_CHAPTERS.flatMap(chapter => 
-        chapter.sections.flatMap(section => 
-          [...(section.hashtags || []).map(tag => tag.startsWith('#') ? tag : `#${tag}`),
-          ...(section.isNew ? ['#new'] : []),
-          ...(section.isUpdated ? ['#updated'] : []),
-          ...(section.isPremium ? ['#premium'] : [])
-          ]
-        )
+      HANDBOOK_CHAPTERS.flatMap((chapter) =>
+        chapter.sections.flatMap((section) => [
+          ...(section.hashtags || []).map((tag) =>
+            tag.startsWith("#") ? tag : `#${tag}`
+          ),
+          ...(section.isNew ? ["#new"] : []),
+          ...(section.isUpdated ? ["#updated"] : []),
+          ...(section.isPremium ? ["#premium"] : []),
+        ])
       )
     )
   ).sort();
@@ -56,17 +56,23 @@ export default function HandbookPage() {
   // Function to check if a section matches active hashtags
   const matchesHashtags = (section: any) => {
     if (activeHashtags.length === 0) return true;
-    
+
     // Create a complete set of section hashtags including special tags
     const sectionTags = [
       // @ts-expect-error resolve types || fix type any
-      ...(section.hashtags || []).map(tag => tag.toLowerCase().startsWith('#') ? tag.toLowerCase() : `#${tag.toLowerCase()}`),
-      ...(section.isNew ? ['#new'] : []),
-      ...(section.isUpdated ? ['#updated'] : []),
-      ...(section.isPremium ? ['#premium'] : [])
+      ...(section.hashtags || []).map((tag) =>
+        tag.toLowerCase().startsWith("#")
+          ? tag.toLowerCase()
+          : `#${tag.toLowerCase()}`
+      ),
+      ...(section.isNew ? ["#new"] : []),
+      ...(section.isUpdated ? ["#updated"] : []),
+      ...(section.isPremium ? ["#premium"] : []),
     ];
-    
-    return activeHashtags.some(tag => sectionTags.includes(tag.toLowerCase()));
+
+    return activeHashtags.some((tag) =>
+      sectionTags.includes(tag.toLowerCase())
+    );
   };
 
   // Filter chapters based on search query, active filter, hashtags, and title filter
@@ -87,10 +93,17 @@ export default function HandbookPage() {
         section.title.toLowerCase().includes(query)
       );
       const matchesSectionHashtags = chapter.sections.some((section) =>
-        section.hashtags?.some(tag => tag.toLowerCase().includes(query))
+        section.hashtags?.some((tag) => tag.toLowerCase().includes(query))
       );
 
-      if (!(matchesTitle || matchesDescription || matchesSectionTitles || matchesSectionHashtags)) {
+      if (
+        !(
+          matchesTitle ||
+          matchesDescription ||
+          matchesSectionTitles ||
+          matchesSectionHashtags
+        )
+      ) {
         return false;
       }
     }
@@ -107,16 +120,6 @@ export default function HandbookPage() {
 
     return true;
   });
-
-  // Calculate stats
-  const totalSections = HANDBOOK_CHAPTERS.reduce(
-    (acc, chapter) => acc + chapter.sections.length,
-    0
-  );
-  const totalChapters = HANDBOOK_CHAPTERS.length;
-  const completionPercentage = Math.floor(
-    (READING_PROGRESS.completed / totalSections) * 100
-  );
 
   // Reset all filters function
   const resetAllFilters = () => {
@@ -201,8 +204,6 @@ export default function HandbookPage() {
                 </button>
               )}
             </div>
-
- 
           </div>
         </div>
         <div className="absolute bottom-0 inset-x-0 h-1/3 bg-gradient-to-t from-gray-50 dark:from-gray-900 to-transparent"></div>
@@ -214,11 +215,16 @@ export default function HandbookPage() {
           <div className="lg:col-span-2">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                {activeTitleFilter || (activeFilter === "all" ? "Barcha bo'limlar" : filteredChapters[0]?.title)}
+                {activeTitleFilter ||
+                  (activeFilter === "all"
+                    ? "Barcha bo'limlar"
+                    : filteredChapters[0]?.title)}
               </h2>
-              
+
               {/* Filter indicators and reset button */}
-              {(activeTitleFilter || activeHashtags.length > 0 || searchQuery) && (
+              {(activeTitleFilter ||
+                activeHashtags.length > 0 ||
+                searchQuery) && (
                 <div className="flex items-center space-x-2">
                   <div className="text-sm text-gray-600 dark:text-gray-400">
                     {activeTitleFilter && (
@@ -237,13 +243,24 @@ export default function HandbookPage() {
                       </span>
                     )}
                   </div>
-                  <button 
+                  <button
                     onClick={resetAllFilters}
                     className="p-1 rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 dark:text-gray-400"
                     title="Filtrlarni tozalash"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      ></path>
                     </svg>
                   </button>
                 </div>
@@ -258,19 +275,19 @@ export default function HandbookPage() {
                     className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 relative"
                   >
                     {/* Add subtle gradient accent at the top */}
-                    <div 
+                    <div
                       className="h-1.5 w-full absolute top-0 left-0"
-                      style={{ 
-                        background: `linear-gradient(to right, ${chapter.color}, ${chapter.color}99)` 
+                      style={{
+                        background: `linear-gradient(to right, ${chapter.color}, ${chapter.color}99)`,
                       }}
                     ></div>
-                    
+
                     <div className="p-7">
                       <div className="flex items-start mb-7">
                         <div
                           className="h-14 w-14 rounded-xl flex items-center justify-center mr-5 flex-shrink-0 shadow-sm transition-transform transform group-hover:scale-110"
-                          style={{ 
-                            background: `linear-gradient(135deg, ${chapter.color}15, ${chapter.color}30)`
+                          style={{
+                            background: `linear-gradient(135deg, ${chapter.color}15, ${chapter.color}30)`,
                           }}
                         >
                           <svg
@@ -289,22 +306,24 @@ export default function HandbookPage() {
                           </svg>
                         </div>
                         <div className="flex-1">
-                          <h3 
+                          <h3
                             className="text-2xl font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors inline-flex items-center group"
-                            onClick={() => handleChapterTitleClick(chapter.title)}
+                            onClick={() =>
+                              handleChapterTitleClick(chapter.title)
+                            }
                           >
                             {chapter.title}
-                            <svg 
-                              className="ml-2 w-5 h-5 text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" 
-                              fill="none" 
-                              viewBox="0 0 24 24" 
+                            <svg
+                              className="ml-2 w-5 h-5 text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                              fill="none"
+                              viewBox="0 0 24 24"
                               stroke="currentColor"
                             >
-                              <path 
-                                strokeLinecap="round" 
-                                strokeLinejoin="round" 
-                                strokeWidth={2} 
-                                d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" 
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"
                               />
                             </svg>
                           </h3>
@@ -317,17 +336,35 @@ export default function HandbookPage() {
                       {/* Section counter badge */}
                       <div className="mb-4 flex items-center justify-between">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                          <svg className="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-14a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V4z" clipRule="evenodd"></path>
+                          <svg
+                            className="w-3.5 h-3.5 mr-1"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-14a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V4z"
+                              clipRule="evenodd"
+                            ></path>
                           </svg>
                           {chapter.sections.length} mavzular
                         </span>
-                        
+
                         {/* Active title filter indicator */}
                         {activeTitleFilter === chapter.title && (
                           <span className="inline-flex items-center text-xs font-medium text-blue-700 dark:text-blue-300">
-                            <svg className="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                              <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd"></path>
+                            <svg
+                              className="w-3.5 h-3.5 mr-1"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                                clipRule="evenodd"
+                              ></path>
                             </svg>
                             Filtrlangan
                           </span>
@@ -336,99 +373,101 @@ export default function HandbookPage() {
 
                       {/* Sections list with better dividers */}
                       <div className="space-y-2 divide-y divide-gray-100 dark:divide-gray-700">
-                        {chapter.sections.filter(matchesHashtags).map((section, idx) => (
-                          <Link
-                            href={`/handbook/${chapter.slug}/${section.slug}`}
-                            key={section.slug}
-                            className="group flex items-start py-4 px-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors relative"
-                          >
-                            <div className="flex-shrink-0 pt-1">
-                              <div 
-                                className="h-7 w-7 rounded-full flex items-center justify-center text-white dark:text-gray-900 shadow-sm transition-transform group-hover:scale-110"
-                                style={{ backgroundColor: chapter.color }}
-                              >
-                                <span className="text-xs font-medium">
-                                  {idx + 1}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="ml-4 flex-1">
-                              <div className="flex items-center flex-wrap gap-2">
-                                <h4 className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                  {section.title}
-                                </h4>
-                                
-                                {/* Hashtags */}
-                                <div className="flex flex-wrap gap-1.5 mt-1 relative z-10">
-                                  {section.isNew && (
-                                    <span 
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        handleHashtagClick("#new");
-                                      }}
-                                      className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer rounded transition-colors group-hover:text-green-800 dark:group-hover:text-green-200"
-                                    >
-                                      #new
-                                    </span>
-                                  )}
-                                  {section.isUpdated && (
-                                    <span 
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        handleHashtagClick("#updated");
-                                      }}
-                                      className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/20 cursor-pointer rounded transition-colors group-hover:text-amber-800 dark:group-hover:text-amber-200"
-                                    >
-                                      #updated
-                                    </span>
-                                  )}
-                                  {section.isPremium && (
-                                    <span 
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        handleHashtagClick("#premium");
-                                      }}
-                                      className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 cursor-pointer rounded transition-colors group-hover:text-purple-800 dark:group-hover:text-purple-200"
-                                    >
-                                      #premium
-                                    </span>
-                                  )}
-                                  {/* Add all defined hashtags */}
-                                  {section.hashtags?.map((tag) => (
-                                    <span 
-                                      key={tag}
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        handleHashtagClick(tag);
-                                      }}
-                                      className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer rounded transition-colors group-hover:text-blue-800 dark:group-hover:text-blue-200"
-                                    >
-                                      {tag.startsWith('#') ? tag : `#${tag}`}
-                                    </span>
-                                  ))}
+                        {chapter.sections
+                          .filter(matchesHashtags)
+                          .map((section, idx) => (
+                            <Link
+                              href={`/handbook/${chapter.slug}/${section.slug}`}
+                              key={section.slug}
+                              className="group flex items-start py-4 px-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors relative"
+                            >
+                              <div className="flex-shrink-0 pt-1">
+                                <div
+                                  className="h-7 w-7 rounded-full flex items-center justify-center text-white dark:text-gray-900 shadow-sm transition-transform group-hover:scale-110"
+                                  style={{ backgroundColor: chapter.color }}
+                                >
+                                  <span className="text-xs font-medium">
+                                    {idx + 1}
+                                  </span>
                                 </div>
                               </div>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
-                                {section.description}
-                              </p>
-                            </div>
-                            <div className="flex items-center self-center ml-2">
-                              <svg
-                                className="h-5 w-5 text-gray-400 dark:text-gray-500 flex-shrink-0 transition-transform transform group-hover:translate-x-1 group-hover:text-blue-500 dark:group-hover:text-blue-400"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M9 5l7 7-7 7"
-                                />
-                              </svg>
-                            </div>
-                          </Link>
-                        ))}
+                              <div className="ml-4 flex-1">
+                                <div className="flex items-center flex-wrap gap-2">
+                                  <h4 className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                    {section.title}
+                                  </h4>
+
+                                  {/* Hashtags */}
+                                  <div className="flex flex-wrap gap-1.5 mt-1 relative z-10">
+                                    {section.isNew && (
+                                      <span
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          handleHashtagClick("#new");
+                                        }}
+                                        className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer rounded transition-colors group-hover:text-green-800 dark:group-hover:text-green-200"
+                                      >
+                                        #new
+                                      </span>
+                                    )}
+                                    {section.isUpdated && (
+                                      <span
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          handleHashtagClick("#updated");
+                                        }}
+                                        className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/20 cursor-pointer rounded transition-colors group-hover:text-amber-800 dark:group-hover:text-amber-200"
+                                      >
+                                        #updated
+                                      </span>
+                                    )}
+                                    {section.isPremium && (
+                                      <span
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          handleHashtagClick("#premium");
+                                        }}
+                                        className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 cursor-pointer rounded transition-colors group-hover:text-purple-800 dark:group-hover:text-purple-200"
+                                      >
+                                        #premium
+                                      </span>
+                                    )}
+                                    {/* Add all defined hashtags */}
+                                    {section.hashtags?.map((tag) => (
+                                      <span
+                                        key={tag}
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          handleHashtagClick(tag);
+                                        }}
+                                        className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer rounded transition-colors group-hover:text-blue-800 dark:group-hover:text-blue-200"
+                                      >
+                                        {tag.startsWith("#") ? tag : `#${tag}`}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
+                                  {section.description}
+                                </p>
+                              </div>
+                              <div className="flex items-center self-center ml-2">
+                                <svg
+                                  className="h-5 w-5 text-gray-400 dark:text-gray-500 flex-shrink-0 transition-transform transform group-hover:translate-x-1 group-hover:text-blue-500 dark:group-hover:text-blue-400"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9 5l7 7-7 7"
+                                  />
+                                </svg>
+                              </div>
+                            </Link>
+                          ))}
                       </div>
                     </div>
                   </div>
@@ -482,14 +521,14 @@ export default function HandbookPage() {
                       key={chapter.id}
                       onClick={() => handleChapterTitleClick(chapter.title)}
                       className={`w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center ${
-                        activeTitleFilter === chapter.title 
+                        activeTitleFilter === chapter.title
                           ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
                           : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                       }`}
                     >
-                      <div 
+                      <div
                         className="w-4 h-4 mr-3 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: chapter.color }}  
+                        style={{ backgroundColor: chapter.color }}
                       ></div>
                       <span className="font-medium">{chapter.title}</span>
                       <div className="ml-auto text-xs text-gray-500 dark:text-gray-400">
