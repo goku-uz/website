@@ -1,9 +1,9 @@
-// filepath: /Users/haywan/Desktop/learning-golang/goku.uz/src/app/handbook/_data.ts
 type ChapterSection = {
   title: string;
   description: string;
   slug: string;
   keywords: string[];
+  hashtags: string[]; // Added explicit hashtags array for filtering
   isNew?: boolean;
   isUpdated?: boolean;
   isPremium?: boolean;
@@ -35,6 +35,7 @@ export const HANDBOOK_CHAPTERS: Chapter[] = [
           "Go dasturlash tiliga umumiy kirish, uning o'rnatilishi va birinchi dastur",
         slug: "introduction",
         keywords: ["go", "golang", "installation", "setup", "hello world"],
+        hashtags: ["#introduction", "#getting_started"], // Added hashtags
         isNew: true,
       },
       {
@@ -42,6 +43,7 @@ export const HANDBOOK_CHAPTERS: Chapter[] = [
         description: "Go dagi o'zgaruvchilar va asosiy ma'lumot turlari haqida",
         slug: "variables-and-data-types",
         keywords: ["variables", "data types", "int", "string", "float", "bool"],
+        hashtags: ["#variables", "#data_types"], // Added hashtags
       },
       {
         title: "Operatorlar va Ifodalar",
@@ -54,18 +56,21 @@ export const HANDBOOK_CHAPTERS: Chapter[] = [
           "logical",
           "comparison",
         ],
+        hashtags: ["#operators", "#expressions"], // Added hashtags
       },
       {
         title: "Shart operatorlari",
         description: "If, else, switch kabi shart operatorlari",
         slug: "conditionals",
         keywords: ["if", "else", "switch", "conditions"],
+        hashtags: ["#conditionals", "#if_else"], // Added hashtags
       },
       {
         title: "Takrorlanish operatorlari",
         description: "For, range, loop kabi takrorlanish operatorlari",
         slug: "loops",
         keywords: ["for", "range", "loop", "iteration"],
+        hashtags: ["#loops", "#iteration"], // Added hashtags
       },
     ],
   },
@@ -82,24 +87,28 @@ export const HANDBOOK_CHAPTERS: Chapter[] = [
         description: "Go funksiyalari, parameterlar va qaytarish qiymatlari",
         slug: "functions",
         keywords: ["functions", "parameters", "return values", "variadic"],
+        hashtags: ["#functions", "#parameters"], // Added hashtags
       },
       {
         title: "Strukturalar (Struct)",
         description: "Go da strukturalar va ularni yaratish",
         slug: "structs",
         keywords: ["struct", "types", "custom types"],
+        hashtags: ["#structs", "#custom_types"], // Added hashtags
       },
       {
         title: "Metodlar",
         description: "Strukturalar uchun metodlar yaratish",
         slug: "methods",
         keywords: ["methods", "receiver", "struct methods"],
+        hashtags: ["#methods", "#struct_methods"], // Added hashtags
       },
       {
         title: "Interface",
         description: "Go da interface va ularni ishlatish",
         slug: "interfaces",
         keywords: ["interface", "polymorphism", "implementation"],
+        hashtags: ["#interfaces", "#polymorphism"], // Added hashtags
         isUpdated: true,
       },
       {
@@ -108,6 +117,7 @@ export const HANDBOOK_CHAPTERS: Chapter[] = [
           "Go paketlaridan foydalanish va o'z modullaringizni yaratish",
         slug: "packages-and-modules",
         keywords: ["package", "module", "import", "go mod"],
+        hashtags: ["#packages", "#modules"], // Added hashtags
       },
     ],
   },
@@ -124,12 +134,14 @@ export const HANDBOOK_CHAPTERS: Chapter[] = [
         description: "Go da yengil vazn threadlar bilan ishlash",
         slug: "goroutines",
         keywords: ["goroutine", "concurrency", "parallel"],
+        hashtags: ["#goroutines", "#concurrency"], // Added hashtags
       },
       {
         title: "Kanallar (Channels)",
         description: "Kanallar orqali goroutinlar o'rtasida ma'lumot almashish",
         slug: "channels",
         keywords: ["channel", "communication", "synchronization"],
+        hashtags: ["#channels", "#communication"], // Added hashtags
       },
       {
         title: "Select Operatori",
@@ -137,18 +149,21 @@ export const HANDBOOK_CHAPTERS: Chapter[] = [
           "Select orqali bir nechta kanal operatsiyalarini boshqarish",
         slug: "select",
         keywords: ["select", "multiple channels", "non-blocking"],
+        hashtags: ["#select", "#non_blocking"], // Added hashtags
       },
       {
         title: "Sync paketi",
         description: "Go ning sync paketi bilan ishlash (mutex, waitgroup)",
         slug: "sync-package",
         keywords: ["mutex", "waitgroup", "atomic", "once"],
+        hashtags: ["#sync", "#mutex"], // Added hashtags
       },
       {
         title: "Parallel Patternlar",
         description: "Go da parallel dasturlash patternlari",
         slug: "concurrency-patterns",
         keywords: ["worker pool", "pipeline", "fan-out", "fan-in"],
+        hashtags: ["#parallel_pattern", "#concurrency_pattern"], // Added hashtags
         isNew: true,
       },
     ],
@@ -166,24 +181,28 @@ export const HANDBOOK_CHAPTERS: Chapter[] = [
         description: "Go da HTTP server yaratish",
         slug: "http-server",
         keywords: ["http", "server", "net/http", "handler"],
+        hashtags: ["#http", "#server"], // Added hashtags
       },
       {
         title: "Routing",
         description: "HTTP so'rovlarini marshrutlash",
         slug: "routing",
         keywords: ["router", "mux", "endpoints"],
+        hashtags: ["#routing", "#endpoints"], // Added hashtags
       },
       {
         title: "Middleware",
         description: "HTTP middleware yaratish va ishlatish",
         slug: "middleware",
         keywords: ["middleware", "handler chaining", "logging"],
+        hashtags: ["#middleware", "#logging"], // Added hashtags
       },
       {
         title: "REST API",
         description: "Go da REST API yaratish",
         slug: "rest-api",
         keywords: ["rest", "api", "json", "endpoints"],
+        hashtags: ["#rest_api", "#json"], // Added hashtags
         isUpdated: true,
       },
       {
@@ -192,6 +211,7 @@ export const HANDBOOK_CHAPTERS: Chapter[] = [
           "Go da ma'lumotlar bazalariga ulanish va so'rovlar yuborish",
         slug: "database-connectivity",
         keywords: ["sql", "database", "query", "orm"],
+        hashtags: ["#database", "#sql"], // Added hashtags
       },
     ],
   },
@@ -208,6 +228,7 @@ export const HANDBOOK_CHAPTERS: Chapter[] = [
         description: "Go da runtime refleksiyadan foydalanish",
         slug: "reflection",
         keywords: ["reflect", "runtime", "type", "value"],
+        hashtags: ["#reflection", "#runtime"], // Added hashtags
         isPremium: true,
       },
       {
@@ -215,6 +236,7 @@ export const HANDBOOK_CHAPTERS: Chapter[] = [
         description: "Go 1.18+ da generik dasturlash",
         slug: "generics",
         keywords: ["generics", "type parameters", "constraints"],
+        hashtags: ["#generics", "#type_parameters"], // Added hashtags
         isNew: true,
       },
       {
@@ -222,18 +244,21 @@ export const HANDBOOK_CHAPTERS: Chapter[] = [
         description: "Go context paketi bilan ishlash",
         slug: "context",
         keywords: ["context", "cancellation", "deadline", "value"],
+        hashtags: ["#context", "#cancellation"], // Added hashtags
       },
       {
         title: "Testlash",
         description: "Go da birlik va integratsion testlarni yozish",
         slug: "testing",
         keywords: ["testing", "unit tests", "benchmark", "mocking"],
+        hashtags: ["#testing", "#unit_tests"], // Added hashtags
       },
       {
         title: "Profiling va Optimizatsiya",
         description: "Go dasturlarini profilaydlash va optimizatsiya qilish",
         slug: "profiling",
         keywords: ["pprof", "profiling", "optimization", "performance"],
+        hashtags: ["#profiling", "#optimization"], // Added hashtags
         isPremium: true,
       },
     ],

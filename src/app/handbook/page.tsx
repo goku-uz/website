@@ -13,10 +13,70 @@ import {
 export default function HandbookPage() {
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [activeHashtags, setActiveHashtags] = useState<string[]>([]);
+  const [activeTitleFilter, setActiveTitleFilter] = useState<string>("");
 
-  // Filter chapters based on search query and active filter
+  // Handle hashtag click
+  const handleHashtagClick = (hashtag: string) => {
+    // Ensure hashtag is in consistent format with # prefix
+    const formattedHashtag = hashtag.startsWith('#') ? hashtag.toLowerCase() : `#${hashtag.toLowerCase()}`;
+    
+    if (activeHashtags.includes(formattedHashtag)) {
+      setActiveHashtags(activeHashtags.filter(tag => tag !== formattedHashtag));
+    } else {
+      setActiveHashtags([...activeHashtags, formattedHashtag]);
+    }
+  };
+
+  // Handle chapter title click
+  const handleChapterTitleClick = (title: string) => {
+    if (activeTitleFilter === title) {
+      setActiveTitleFilter(""); // Clear the filter if clicking the same title
+    } else {
+      setActiveTitleFilter(title);
+      setSearchQuery(""); // Clear search query when filtering by title
+    }
+  };
+
+  // Extract all available hashtags for display and ensure they have # prefix
+  const allHashtags = Array.from(
+    new Set(
+      HANDBOOK_CHAPTERS.flatMap(chapter => 
+        chapter.sections.flatMap(section => 
+          [...(section.hashtags || []).map(tag => tag.startsWith('#') ? tag : `#${tag}`),
+          ...(section.isNew ? ['#new'] : []),
+          ...(section.isUpdated ? ['#updated'] : []),
+          ...(section.isPremium ? ['#premium'] : [])
+          ]
+        )
+      )
+    )
+  ).sort();
+
+  // Function to check if a section matches active hashtags
+  const matchesHashtags = (section: any) => {
+    if (activeHashtags.length === 0) return true;
+    
+    // Create a complete set of section hashtags including special tags
+    const sectionTags = [
+      // @ts-expect-error resolve types || fix type any
+      ...(section.hashtags || []).map(tag => tag.toLowerCase().startsWith('#') ? tag.toLowerCase() : `#${tag.toLowerCase()}`),
+      ...(section.isNew ? ['#new'] : []),
+      ...(section.isUpdated ? ['#updated'] : []),
+      ...(section.isPremium ? ['#premium'] : [])
+    ];
+    
+    return activeHashtags.some(tag => sectionTags.includes(tag.toLowerCase()));
+  };
+
+  // Filter chapters based on search query, active filter, hashtags, and title filter
   const filteredChapters = HANDBOOK_CHAPTERS.filter((chapter) => {
-    // If search query exists, filter by title or description
+    // If title filter is active, only show that chapter
+    if (activeTitleFilter && chapter.title !== activeTitleFilter) {
+      return false;
+    }
+
+    // If search query exists, filter by title, description, or hashtags
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       const matchesTitle = chapter.title.toLowerCase().includes(query);
@@ -26,14 +86,22 @@ export default function HandbookPage() {
       const matchesSectionTitles = chapter.sections.some((section) =>
         section.title.toLowerCase().includes(query)
       );
+      const matchesSectionHashtags = chapter.sections.some((section) =>
+        section.hashtags?.some(tag => tag.toLowerCase().includes(query))
+      );
 
-      if (!(matchesTitle || matchesDescription || matchesSectionTitles)) {
+      if (!(matchesTitle || matchesDescription || matchesSectionTitles || matchesSectionHashtags)) {
         return false;
       }
     }
 
     // Apply category filter
     if (activeFilter !== "all" && chapter.id !== activeFilter) {
+      return false;
+    }
+
+    // Check if any section matches active hashtags
+    if (activeHashtags.length > 0 && !chapter.sections.some(matchesHashtags)) {
       return false;
     }
 
@@ -49,6 +117,14 @@ export default function HandbookPage() {
   const completionPercentage = Math.floor(
     (READING_PROGRESS.completed / totalSections) * 100
   );
+
+  // Reset all filters function
+  const resetAllFilters = () => {
+    setSearchQuery("");
+    setActiveFilter("all");
+    setActiveHashtags([]);
+    setActiveTitleFilter("");
+  };
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -77,7 +153,7 @@ export default function HandbookPage() {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Mavzularni qidirish..."
+                  placeholder="Mavzularni yoki hashtag-larni qidirish..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-white dark:bg-gray-800 rounded-lg py-4 pl-12 pr-4 shadow-inner focus:outline-none text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500"
@@ -101,31 +177,32 @@ export default function HandbookPage() {
               </div>
             </div>
 
-            <div className="inline-flex flex-wrap gap-2 justify-center">
-              <button
-                onClick={() => setActiveFilter("all")}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  activeFilter === "all"
-                    ? "bg-white text-blue-700 shadow-lg"
-                    : "bg-blue-700/30 text-white hover:bg-blue-700/50"
-                }`}
-              >
-                Barcha bo&apos;limlar
-              </button>
-              {HANDBOOK_CHAPTERS.map((chapter) => (
+            {/* Hashtags filter */}
+            <div className="flex flex-wrap gap-2 justify-center mb-6 z-50 relative">
+              {allHashtags.slice(0, 10).map((hashtag) => (
                 <button
-                  key={chapter.id}
-                  onClick={() => setActiveFilter(chapter.id)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    activeFilter === chapter.id
-                      ? "bg-white text-blue-700 shadow-lg"
-                      : "bg-blue-700/30 text-white hover:bg-blue-700/50"
+                  key={hashtag}
+                  onClick={() => handleHashtagClick(hashtag)}
+                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                    activeHashtags.includes(hashtag.toLowerCase())
+                      ? "bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100"
+                      : "bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-800/50"
                   }`}
                 >
-                  {chapter.title}
+                  {hashtag}
                 </button>
               ))}
+              {activeHashtags.length > 0 && (
+                <button
+                  onClick={() => setActiveHashtags([])}
+                  className="px-3 py-1 rounded-full text-sm font-medium bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-800/50"
+                >
+                  Hashtag-larni tozalash
+                </button>
+              )}
             </div>
+
+ 
           </div>
         </div>
         <div className="absolute bottom-0 inset-x-0 h-1/3 bg-gradient-to-t from-gray-50 dark:from-gray-900 to-transparent"></div>
@@ -135,27 +212,69 @@ export default function HandbookPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
-              {activeFilter === "all"
-                ? "Barcha bo'limlar"
-                : filteredChapters[0]?.title}
-            </h2>
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+                {activeTitleFilter || (activeFilter === "all" ? "Barcha bo'limlar" : filteredChapters[0]?.title)}
+              </h2>
+              
+              {/* Filter indicators and reset button */}
+              {(activeTitleFilter || activeHashtags.length > 0 || searchQuery) && (
+                <div className="flex items-center space-x-2">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    {activeTitleFilter && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 mr-2">
+                        {activeTitleFilter}
+                      </span>
+                    )}
+                    {activeHashtags.length > 0 && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 mr-2">
+                        {activeHashtags.length} hashtag
+                      </span>
+                    )}
+                    {searchQuery && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                        Qidiruv: "{searchQuery}"
+                      </span>
+                    )}
+                  </div>
+                  <button 
+                    onClick={resetAllFilters}
+                    className="p-1 rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 dark:text-gray-400"
+                    title="Filtrlarni tozalash"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </div>
 
             {filteredChapters.length > 0 ? (
               <div className="space-y-10">
                 {filteredChapters.map((chapter) => (
                   <div
                     key={chapter.id}
-                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow"
+                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 relative"
                   >
-                    <div className="p-6">
-                      <div className="flex items-start mb-6">
+                    {/* Add subtle gradient accent at the top */}
+                    <div 
+                      className="h-1.5 w-full absolute top-0 left-0"
+                      style={{ 
+                        background: `linear-gradient(to right, ${chapter.color}, ${chapter.color}99)` 
+                      }}
+                    ></div>
+                    
+                    <div className="p-7">
+                      <div className="flex items-start mb-7">
                         <div
-                          className="h-12 w-12 rounded-lg flex items-center justify-center mr-4 flex-shrink-0"
-                          style={{ backgroundColor: `${chapter.color}15` }}
+                          className="h-14 w-14 rounded-xl flex items-center justify-center mr-5 flex-shrink-0 shadow-sm transition-transform transform group-hover:scale-110"
+                          style={{ 
+                            background: `linear-gradient(135deg, ${chapter.color}15, ${chapter.color}30)`
+                          }}
                         >
                           <svg
-                            className="h-6 w-6"
+                            className="h-7 w-7"
                             style={{ color: chapter.color }}
                             fill="none"
                             viewBox="0 0 24 24"
@@ -169,68 +288,145 @@ export default function HandbookPage() {
                             />
                           </svg>
                         </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                        <div className="flex-1">
+                          <h3 
+                            className="text-2xl font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors inline-flex items-center group"
+                            onClick={() => handleChapterTitleClick(chapter.title)}
+                          >
                             {chapter.title}
+                            <svg 
+                              className="ml-2 w-5 h-5 text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" 
+                              fill="none" 
+                              viewBox="0 0 24 24" 
+                              stroke="currentColor"
+                            >
+                              <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth={2} 
+                                d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" 
+                              />
+                            </svg>
                           </h3>
-                          <p className="text-gray-600 dark:text-gray-300 mt-1">
+                          <p className="text-gray-600 dark:text-gray-300 mt-1.5 leading-relaxed">
                             {chapter.description}
                           </p>
                         </div>
                       </div>
 
-                      <div className="space-y-3">
-                        {chapter.sections.map((section, idx) => (
+                      {/* Section counter badge */}
+                      <div className="mb-4 flex items-center justify-between">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                          <svg className="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-14a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V4z" clipRule="evenodd"></path>
+                          </svg>
+                          {chapter.sections.length} mavzular
+                        </span>
+                        
+                        {/* Active title filter indicator */}
+                        {activeTitleFilter === chapter.title && (
+                          <span className="inline-flex items-center text-xs font-medium text-blue-700 dark:text-blue-300">
+                            <svg className="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                              <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd"></path>
+                            </svg>
+                            Filtrlangan
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Sections list with better dividers */}
+                      <div className="space-y-2 divide-y divide-gray-100 dark:divide-gray-700">
+                        {chapter.sections.filter(matchesHashtags).map((section, idx) => (
                           <Link
                             href={`/handbook/${chapter.slug}/${section.slug}`}
                             key={section.slug}
-                            className="flex items-start p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                            className="group flex items-start py-4 px-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors relative"
                           >
                             <div className="flex-shrink-0 pt-1">
-                              <div className="h-6 w-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                              <div 
+                                className="h-7 w-7 rounded-full flex items-center justify-center text-white dark:text-gray-900 shadow-sm transition-transform group-hover:scale-110"
+                                style={{ backgroundColor: chapter.color }}
+                              >
                                 <span className="text-xs font-medium">
                                   {idx + 1}
                                 </span>
                               </div>
                             </div>
-                            <div className="ml-3 flex-1">
-                              <div className="flex items-center gap-2">
-                                <h4 className="font-medium text-gray-900 dark:text-white">
+                            <div className="ml-4 flex-1">
+                              <div className="flex items-center flex-wrap gap-2">
+                                <h4 className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                   {section.title}
                                 </h4>
-                                {section.isNew && (
-                                  <span className="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:text-green-300">
-                                    Yangi
-                                  </span>
-                                )}
-                                {section.isUpdated && (
-                                  <span className="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/30 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">
-                                    Yangilangan
-                                  </span>
-                                )}
-                                {section.isPremium && (
-                                  <span className="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 px-2.5 py-0.5 text-xs font-medium text-purple-700 dark:text-purple-300">
-                                    Premium
-                                  </span>
-                                )}
+                                
+                                {/* Hashtags */}
+                                <div className="flex flex-wrap gap-1.5 mt-1 relative z-10">
+                                  {section.isNew && (
+                                    <span 
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handleHashtagClick("#new");
+                                      }}
+                                      className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer rounded transition-colors group-hover:text-green-800 dark:group-hover:text-green-200"
+                                    >
+                                      #new
+                                    </span>
+                                  )}
+                                  {section.isUpdated && (
+                                    <span 
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handleHashtagClick("#updated");
+                                      }}
+                                      className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/20 cursor-pointer rounded transition-colors group-hover:text-amber-800 dark:group-hover:text-amber-200"
+                                    >
+                                      #updated
+                                    </span>
+                                  )}
+                                  {section.isPremium && (
+                                    <span 
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handleHashtagClick("#premium");
+                                      }}
+                                      className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 cursor-pointer rounded transition-colors group-hover:text-purple-800 dark:group-hover:text-purple-200"
+                                    >
+                                      #premium
+                                    </span>
+                                  )}
+                                  {/* Add all defined hashtags */}
+                                  {section.hashtags?.map((tag) => (
+                                    <span 
+                                      key={tag}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handleHashtagClick(tag);
+                                      }}
+                                      className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer rounded transition-colors group-hover:text-blue-800 dark:group-hover:text-blue-200"
+                                    >
+                                      {tag.startsWith('#') ? tag : `#${tag}`}
+                                    </span>
+                                  ))}
+                                </div>
                               </div>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
                                 {section.description}
                               </p>
                             </div>
-                            <svg
-                              className="h-5 w-5 text-gray-400 dark:text-gray-500 flex-shrink-0 ml-2"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9 5l7 7-7 7"
-                              />
-                            </svg>
+                            <div className="flex items-center self-center ml-2">
+                              <svg
+                                className="h-5 w-5 text-gray-400 dark:text-gray-500 flex-shrink-0 transition-transform transform group-hover:translate-x-1 group-hover:text-blue-500 dark:group-hover:text-blue-400"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 5l7 7-7 7"
+                                />
+                              </svg>
+                            </div>
                           </Link>
                         ))}
                       </div>
@@ -263,10 +459,7 @@ export default function HandbookPage() {
                   Iltimos, qidiruv so&apos;rovingizni o&apos;zgartiring.
                 </p>
                 <button
-                  onClick={() => {
-                    setSearchQuery("");
-                    setActiveFilter("all");
-                  }}
+                  onClick={resetAllFilters}
                   className="inline-flex items-center px-4 py-2 rounded-lg text-blue-700 border border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium"
                 >
                   Barcha bo&apos;limlarni ko&apos;rsatish
@@ -277,6 +470,47 @@ export default function HandbookPage() {
 
           {/* Sidebar */}
           <div className="space-y-8">
+            {/* Chapter Titles Filter Section - New Addition */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                  Bo&apos;limlar
+                </h3>
+                <div className="space-y-2">
+                  {HANDBOOK_CHAPTERS.map((chapter) => (
+                    <button
+                      key={chapter.id}
+                      onClick={() => handleChapterTitleClick(chapter.title)}
+                      className={`w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center ${
+                        activeTitleFilter === chapter.title 
+                          ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                      }`}
+                    >
+                      <div 
+                        className="w-4 h-4 mr-3 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: chapter.color }}  
+                      ></div>
+                      <span className="font-medium">{chapter.title}</span>
+                      <div className="ml-auto text-xs text-gray-500 dark:text-gray-400">
+                        {chapter.sections.length}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                {activeTitleFilter && (
+                  <div className="mt-4">
+                    <button
+                      onClick={() => setActiveTitleFilter("")}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 font-medium hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-sm"
+                    >
+                      Barcha bo&apos;limlarni ko&apos;rsatish
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Authors */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
               <div className="p-6">
@@ -386,7 +620,7 @@ export default function HandbookPage() {
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
-                        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.96 7.96 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"></path>
+                        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 005.5 14c1.669 0 3.218.51 4.5 1.385A7.96 7.96 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"></path>
                       </svg>
                     </div>
                     <div>
