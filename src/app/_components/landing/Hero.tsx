@@ -92,7 +92,7 @@ export default function Hero() {
               {/* Code block with parallax effect */}
               <div className="relative mx-auto max-w-lg transform hover:-rotate-1 hover:scale-105 transition-all duration-300">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-emerald-500/20 rounded-xl blur-xl transform -rotate-3"></div>
-                <div className="p-3 bg-white rounded-xl shadow-xl border border-gray-100 relative z-10">
+                <div className="p-3 rounded-xl shadow-xl border relative z-10">
                   {/* Decorative code editor header */}
                   <CodeBlock
                     code={`package main
