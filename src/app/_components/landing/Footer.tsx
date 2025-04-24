@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 border-t border-gray-200">
+    <footer className="bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8 border-t border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
           <div>
@@ -16,9 +16,9 @@ export default function Footer() {
                 alt="Go Uzbekistan"
                 className="rounded-full"
               />
-              <h4 className="font-bold text-gray-800">GoKu.uz</h4>
+              <h4 className="font-bold text-gray-800 dark:text-gray-100">GoKu.uz</h4>
             </div>
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
               O&apos;zbek dasturchilar uchun Go qo&apos;llanmasi
             </p>
           </div>
@@ -60,7 +60,7 @@ export default function Footer() {
             },
           ].map((section, i) => (
             <div key={i}>
-              <h5 className="font-semibold text-gray-800 mb-3 text-sm">
+              <h5 className="font-semibold text-gray-800 dark:text-gray-100 mb-3 text-sm">
                 {section.title}
               </h5>
               <ul className="space-y-2 text-sm">
@@ -71,14 +71,14 @@ export default function Footer() {
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-gray-600 hover:text-blue-600 transition-colors"
+                        className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                       >
                         {link.text}
                       </a>
                     ) : (
                       <Link
                         href={link.href}
-                        className="text-gray-600 hover:text-blue-600 transition-colors"
+                        className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                       >
                         {link.text}
                       </Link>
@@ -89,7 +89,7 @@ export default function Footer() {
             </div>
           ))}
         </div>
-        <div className="pt-4 border-t border-gray-200 text-center text-gray-500 text-sm">
+        <div className="pt-4 border-t border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400 text-sm">
           <p>
             © {new Date().getFullYear()} GoKu.uz - O&apos;zbekiston Go dasturlash
             tili jamoasi
