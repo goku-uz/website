@@ -4,6 +4,7 @@ import { Metadata } from "next";
 import Header from "./_components/landing/Header";
 import Footer from "./_components/landing/Footer";
 import React from "react";
+import { ThemeProvider } from "next-themes";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -18,13 +19,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="uz">
+    <html lang="uz" suppressHydrationWarning>
       <body
         className={`${spaceGrotesk.variable} ${spaceGrotesk.className} antialiased`}
       >
-        <Header />
-        {children}
-        <Footer />
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Header />
+          {children}
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );
