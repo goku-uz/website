@@ -159,7 +159,7 @@ export default function HandbookPage() {
                   placeholder="Mavzularni yoki hashtag-larni qidirish..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white dark:bg-gray-800 rounded-lg py-4 pl-12 pr-4 shadow-inner focus:outline-none text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500"
+                  className="w-full bg-white dark:bg-gray-800 rounded-lg py-4 pl-12 pr-4 shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500"
                 />
                 <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
                   <svg
@@ -656,10 +656,16 @@ export default function HandbookPage() {
                     <div className="flex-shrink-0 bg-blue-100 dark:bg-blue-800/30 p-2 rounded-lg">
                       <svg
                         className="h-5 w-5 text-blue-600 dark:text-blue-400"
-                        fill="currentColor"
+                        fill="none"
                         viewBox="0 0 20 20"
+                        stroke="currentColor"
                       >
-                        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 005.5 14c1.669 0 3.218.51 4.5 1.385A7.96 7.96 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"></path>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 005.5 14c1.669 0 3.218.51 4.5 1.385A7.96 7.96 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"
+                        ></path>
                       </svg>
                     </div>
                     <div>
@@ -735,7 +741,7 @@ export default function HandbookPage() {
               </div>
 
               <div className="lg:col-span-2">
-                <form className="space-y-2">
+                <form className="space-y-3">
                   <div>
                     <label htmlFor="email" className="sr-only">
                       Email manzil
@@ -745,14 +751,14 @@ export default function HandbookPage() {
                       name="email"
                       type="email"
                       required
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                      className="w-full px-4 py-3.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 shadow-sm"
                       placeholder="Elektron pochta manzilingiz"
                     />
                   </div>
                   <div>
                     <button
                       type="submit"
-                      className="w-full px-4 py-3 border border-transparent rounded-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-md hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      className="w-full px-4 py-3.5 border border-transparent rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
                       Obuna bo&apos;lish
                     </button>
