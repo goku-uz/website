@@ -2,7 +2,7 @@
 
 export default function Newsletter() {
   return (
-    <section className="relative px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto py-12 my-8 bg-blue-900 rounded-md">
+    <section className="relative px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto py-12 my-8 bg-blue-900 rounded-2xl shadow-xl overflow-hidden">
       <div className="absolute inset-0 -z-10 rounded-2xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-800"></div>
         <div className="absolute inset-0 bg-[url('/uzbek-pattern-light.svg')] opacity-10 bg-repeat"></div>
@@ -10,7 +10,7 @@ export default function Newsletter() {
       </div>
 
       <div className="relative z-10 text-center px-4 py-8">
-        <div className="inline-block mb-6 p-2 bg-white/10 backdrop-blur-sm rounded-full">
+        <div className="inline-block mb-6 p-3 bg-white/10 backdrop-blur-sm rounded-full">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -34,21 +34,19 @@ export default function Newsletter() {
           Go ekotizimi yangiliklari, qo&apos;llanmadagi o&apos;zgarishlar va
           jamiyat tadbirlari haqida xabardor bo&apos;ling
         </p>
-        <form className="flex flex-col sm:flex-row max-w-md mx-auto gap-2">
+        <form className="flex flex-col sm:flex-row max-w-md mx-auto gap-3">
           <input
             type="email"
             placeholder="Email manzilingiz"
-            className="px-4 py-3 rounded-lg flex-grow focus:outline-none focus:ring-2 focus:ring-yellow-400 text-gray-800 bg-white/95"
+            className="px-4 py-3.5 rounded-lg flex-grow focus:outline-none focus:ring-2 focus:ring-yellow-400 text-gray-800 bg-white/95 shadow-lg border border-white/50"
           />
           <button
             type="submit"
-            className="bg-yellow-400 hover:bg-yellow-300 text-blue-900 px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap"
+            className="bg-yellow-400 hover:bg-yellow-300 text-blue-900 px-6 py-3.5 rounded-lg font-medium transition-colors whitespace-nowrap shadow-lg hover:shadow-xl transition-all duration-200"
           >
             Obuna bo&apos;lish
           </button>
         </form>
-
-        {/* get start button */}
       </div>
     </section>
   );
